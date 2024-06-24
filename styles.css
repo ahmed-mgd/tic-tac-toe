@@ -6,7 +6,7 @@
 }
 
 :root {
-    --cell-size: 2rem;
+    --cell-size: 10rem;
 }
 
 #start-menu {
@@ -19,13 +19,12 @@
 
 #board {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: repeat(3, 1fr);
     margin: auto;
 }
 
 .cell {
-    border: 2px solid black;
-    border-width: 0 1px;
+    border: 1px solid black;
     width: var(--cell-size);
     height: var(--cell-size);
 }

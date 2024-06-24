@@ -1,16 +1,26 @@
 const gameBoard = (function() {
     let board;
+    let activePlayer = 1;
     const resetBoard = () => {
         board = Array(9).fill(0);
     }
     resetBoard();
 
     const getBoard = () => board;
+    const getActivePlayer = () => activePlayer;
 
-    const fillCell = (index, playerNum) => {
+    // Returns true if cell is valid, false otherwise
+    const fillCell = (index) => {
         if (board[index] === 0) {
-            board[index] += playerNum;
+            board[index] += activePlayer;
+            return true;
+        } else {
+            return false;
         }
+    }
+
+    const switchTurn = () => {
+        activePlayer = activePlayer === 1 ? 2 : 1;
     }
 
     const checkWin = () => {
@@ -53,25 +63,13 @@ const gameBoard = (function() {
         return winnerId;
     }
 
-    const printBoard = () => {
-        const symbolArray = board.map((element) => {
-            if (element === 0) {
-                return "_";
-            } else if (element === 1) {
-                return "X";
-            } else {
-                return "O";
-            }
-        });
-        console.log(symbolArray);
-    }
-
     return {
         getBoard,
         resetBoard,
         fillCell,
         checkWin,
-        printBoard
+        getActivePlayer,
+        switchTurn
     };
 })();
 
@@ -106,6 +104,11 @@ const gameView = (function() {
         startMenu.close();
     }
 
+    const markCell = (index) => {
+        const label = gameBoard.getActivePlayer() === 1 ? "X" : "O";
+        cells[index].textContent = label;
+    }
+
     startBtn.addEventListener("click", () => {
         gameController.handleStart();
     });
@@ -119,7 +122,8 @@ const gameView = (function() {
     return {
         getPlayerName,
         showMenu,
-        hideMenu
+        hideMenu,
+        markCell
     }
 })();
 
@@ -134,29 +138,31 @@ const gameController = (function() {
         gameView.hideMenu();
     }
 
+    const handleWin = (winnerId) => {
+        // Show summary modal with "play again"
+        if (winner === 0) {
+            console.log("Tie!");
+        } else if (winner > 0) {
+            console.log(`${activePlayer.name} wins!`);
+        }
+    }
+
     const handleCellClick = (index) => {
         const playerNum = playerOneTurn ? 1 : 2;
-        gameBoard.fillCell(index, playerNum);
+        if (gameBoard.fillCell(index)) {
+            gameView.markCell(index);
+            const winnerId = gameBoard.checkWin();
+            if (winnerId >= 0) {
+                handleWin(winnerId);
+            } else {
+                gameBoard.switchTurn();
+            }
+        }
     }
-    
-    // let playerOneTurn = true;
-    // while (true) {
-    //     const activePlayer = playerOneTurn ? playerOne : playerTwo;
-    //     let cellIndex = prompt(`${activePlayer.name}, enter a cell (0-8):`);
-    //     gameBoard.fillCell(cellIndex, activePlayer.getNumber());
-    //     gameBoard.printBoard();
-    //     const winner = gameBoard.checkWin();
-    //     if (winner === 0) {
-    //         console.log("Tie!");
-    //         break;
-    //     } else if (winner > 0) {
-    //         console.log(`${activePlayer.name} wins!`);
-    //         break;
-    //     }
-    //     playerOneTurn = !playerOneTurn;
-    // }
+
     return {
         handleStart,
+        handleWin,
         handleCellClick
     }
 })();
