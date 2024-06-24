@@ -1,10 +1,11 @@
 const gameBoard = (function() {
     let board;
-    let activePlayer = 1;
-    const resetBoard = () => {
+    let activePlayer;
+    const reset = () => {
         board = Array(9).fill(0);
+        activePlayer = 1;
     }
-    resetBoard();
+    reset();
 
     const getBoard = () => board;
     const getActivePlayer = () => activePlayer;
@@ -23,14 +24,14 @@ const gameBoard = (function() {
         activePlayer = activePlayer === 1 ? 2 : 1;
     }
 
-    const checkWin = () => {
+    const checkWin = (lastIndex) => {
         let endGame = false;
         let winnerId = -1;
 
         // Check all winning combinations (simplify)
         for (let i = 0; i < 3; i++) {
             if (board[i] === 0) {
-                break;
+                continue;
             }
             if (board[i] === board[i + 3] && board[i] === board[i + 6]) {
                 endGame = true;
@@ -40,7 +41,7 @@ const gameBoard = (function() {
 
         for (let i = 0; i < 9; i += 3) {
             if (board[i] === 0) {
-                break;
+                continue;
             }
             if (board[i] === board[i + 1] && board[i] === board[i + 2]) {
                 endGame = true;
@@ -65,7 +66,7 @@ const gameBoard = (function() {
 
     return {
         getBoard,
-        resetBoard,
+        reset,
         fillCell,
         checkWin,
         getActivePlayer,
@@ -74,34 +75,40 @@ const gameBoard = (function() {
 })();
 
 function createPlayer(name, number) {
-    let numWins = 0;
-
     const getNumber = () => number;
-    const getWins = () => numWins;
-    const awardWin = () => numWins++;
-
     return {
         name,
-        getNumber,
-        getWins,
-        awardWin
+        getNumber
     }
 }
 
 const gameView = (function() {
     const startMenu = document.querySelector("#start-menu")
     const startBtn = document.querySelector("#start-button");
+    const summaryMenu = document.querySelector("#summary-menu");
+    const summaryMessage = document.querySelector("#summary-message")
+    const playAgainBtn = document.querySelector("#play-again-button");
+    const gameMessage = document.querySelector("#game-message");
     const nameFields = document.querySelectorAll(".name-field");
     const cells = document.querySelectorAll(".cell");
 
     const getPlayerName = (number) => nameFields[number - 1].value;
 
-    const showMenu = () => {
+    const showStartMenu = () => {
         startMenu.showModal();
     }
 
-    const hideMenu = () => {
+    const hideStartMenu = () => {
         startMenu.close();
+    }
+
+    const showSummary = (message) => {
+        summaryMessage.textContent = message;
+        summaryMenu.showModal();
+    }
+
+    const hideSummary = () => {
+        summaryMenu.close();
     }
 
     const markCell = (index) => {
@@ -109,8 +116,22 @@ const gameView = (function() {
         cells[index].textContent = label;
     }
 
+    const reset = () => {
+        cells.forEach((cell) => {
+            cell.textContent = "";
+        });
+    }
+
+    const updateGameMessage = (message) => {
+        gameMessage.textContent = message;
+    }
+
     startBtn.addEventListener("click", () => {
         gameController.handleStart();
+    });
+
+    playAgainBtn.addEventListener("click", () => {
+        gameController.handlePlayAgain();
     });
 
     cells.forEach((cell, i) => {
@@ -121,34 +142,47 @@ const gameView = (function() {
 
     return {
         getPlayerName,
-        showMenu,
-        hideMenu,
-        markCell
+        showStartMenu,
+        hideStartMenu,
+        showSummary,
+        hideSummary,
+        markCell,
+        reset,
+        updateGameMessage
     }
 })();
 
 const gameController = (function() {
-    let playerOneTurn = true;
-    gameView.showMenu();
+    const playerOne = createPlayer("Player 1", 1);
+    const playerTwo = createPlayer("Player 2", 2);
+    gameView.showStartMenu();
 
     const handleStart = () => {
-        playerOne = createPlayer(gameView.getPlayerName(1), 1);
-        playerOne = createPlayer(gameView.getPlayerName(2), 2);
+        playerOne.name = gameView.getPlayerName(1);
+        playerTwo.name = gameView.getPlayerName(2);
+        gameView.hideStartMenu();
+        gameView.updateGameMessage(`${playerOne.name}'s turn (X)`);
+    }
 
-        gameView.hideMenu();
+    const handlePlayAgain = () => {
+        gameBoard.reset();
+        gameView.hideSummary();
+        gameView.reset();
+        gameView.updateGameMessage(`${playerOne.name}'s turn (X)`);
     }
 
     const handleWin = (winnerId) => {
-        // Show summary modal with "play again"
-        if (winner === 0) {
-            console.log("Tie!");
-        } else if (winner > 0) {
-            console.log(`${activePlayer.name} wins!`);
+        let message;
+        if (winnerId === 0) {
+            message = "The players tied!"
+        } else if (winnerId > 0) {
+            const winnerName = winnerId === 1 ? playerOne.name : playerTwo.name;
+            message = `${winnerName} wins!`;
         }
+        gameView.showSummary(message);
     }
 
     const handleCellClick = (index) => {
-        const playerNum = playerOneTurn ? 1 : 2;
         if (gameBoard.fillCell(index)) {
             gameView.markCell(index);
             const winnerId = gameBoard.checkWin();
@@ -156,12 +190,16 @@ const gameController = (function() {
                 handleWin(winnerId);
             } else {
                 gameBoard.switchTurn();
+                const activePlayer = gameBoard.getActivePlayer() === 1 ? playerOne : playerTwo;
+                const label = gameBoard.getActivePlayer() === 1 ? "X" : "O";
+                gameView.updateGameMessage(`${activePlayer.name}'s turn (${label})`);
             }
         }
     }
 
     return {
         handleStart,
+        handlePlayAgain,
         handleWin,
         handleCellClick
     }

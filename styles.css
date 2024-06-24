@@ -2,29 +2,73 @@
     box-sizing: border-box;
     padding: 0;
     margin: 0;
-    font-family: 'Helvetica', 'Arial', sans-serif;
+    font-family: 'Fira Sans', 'Helvetica', 'Arial', sans-serif;
+    text-align: center;
+    color: white;
 }
 
 :root {
     --cell-size: 10rem;
+    --header-height: 8rem;
 }
 
-#start-menu {
+#main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    padding: 3rem;
+    height: calc(100vh - 8rem);
+}
+
+#start-menu, #summary-menu {
     margin: auto;
+    padding: 2rem;
+    border-radius: 10px;
+    background-color: #014232;
+    font-size: 20px;
 }
 
 #start-form li {
     list-style: none;
 }
 
+#start-form input {
+    color: black;
+    text-align: left;
+}
+
+#header {
+    background: #014232;
+    height: var(--header-height);
+    font-size: 5rem;
+    padding-top: 1rem;
+}
+
+#main {
+    background: #256F5C;
+}
+
 #board {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    margin: auto;
+    grid-template-columns: repeat(3, var(--cell-size));
+    margin: 0 auto;
 }
 
 .cell {
-    border: 1px solid black;
+    border: 3px solid white;
     width: var(--cell-size);
     height: var(--cell-size);
+    font-size: var(--cell-size);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+button {
+    padding: 0.3rem;
+    background-color: blue;
+    color: white;
+    margin-top: 1rem;
+    font-size: 20px;
 }
