@@ -3,9 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Tic Tac Toe</title>
 </head>
 <body>
+    <dialog id="start-menu">
+        <ul id="start-form">
+            <li>
+                <label for="player1-name">X Player 1:</label>
+                <input type="text" id="player1-name" name="player1_name" class="name-field">
+            </li>
+            <li>
+                <label for="player2-name">O Player 2:</label>
+                <input type="text" id="player2-name" name="player2_name" class="name-field">
+            </li>
+        </ul>
+        <button id="start-button" type="button">START</button>
+    </dialog>
+    <div id="board">
+        <div id="cell0" class="cell"></div>
+        <div id="cell1" class="cell"></div>
+        <div id="cell2" class="cell"></div>
+        <div id="cell3" class="cell"></div>
+        <div id="cell4" class="cell"></div>
+        <div id="cell5" class="cell"></div>
+        <div id="cell6" class="cell"></div>
+        <div id="cell7" class="cell"></div>
+        <div id="cell8" class="cell"></div>
+    </div>
     <script src="main.js"></script>
 </body>
 </html>

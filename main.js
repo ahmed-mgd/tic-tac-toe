@@ -76,7 +76,7 @@ const gameBoard = (function() {
 })();
 
 function createPlayer(name, number) {
-    const numWins = 0;
+    let numWins = 0;
 
     const getNumber = () => number;
     const getWins = () => numWins;
@@ -90,26 +90,73 @@ function createPlayer(name, number) {
     }
 }
 
-const gameController = (function() {
-    const playerOne = createPlayer(prompt("Enter name for Player 1: "), 1);
-    const playerTwo = createPlayer(prompt("Enter name for Player 2: "), 2);
-    let playerOneTurn = true;
+const gameView = (function() {
+    const startMenu = document.querySelector("#start-menu")
+    const startBtn = document.querySelector("#start-button");
+    const nameFields = document.querySelectorAll(".name-field");
+    const cells = document.querySelectorAll(".cell");
 
-    while (true) {
-        const activePlayer = playerOneTurn ? playerOne : playerTwo;
-        let cellIndex = prompt(`${activePlayer.name}, enter a cell (0-8):`);
-        gameBoard.fillCell(cellIndex, activePlayer.getNumber());
-        gameBoard.printBoard();
-        const winner = gameBoard.checkWin();
-        if (winner === 0) {
-            console.log("Tie!");
-            break;
-        } else if (winner > 0) {
-            console.log(`${activePlayer.name} wins!`);
-            break;
-        }
-        playerOneTurn = !playerOneTurn;
+    const getPlayerName = (number) => nameFields[number - 1].value;
+
+    const showMenu = () => {
+        startMenu.showModal();
     }
-});
 
-gameController();
+    const hideMenu = () => {
+        startMenu.close();
+    }
+
+    startBtn.addEventListener("click", () => {
+        gameController.handleStart();
+    });
+
+    cells.forEach((cell, i) => {
+        cell.addEventListener("click", () => {
+            gameController.handleCellClick(i);
+        });
+    });
+
+    return {
+        getPlayerName,
+        showMenu,
+        hideMenu
+    }
+})();
+
+const gameController = (function() {
+    let playerOneTurn = true;
+    gameView.showMenu();
+
+    const handleStart = () => {
+        playerOne = createPlayer(gameView.getPlayerName(1), 1);
+        playerOne = createPlayer(gameView.getPlayerName(2), 2);
+
+        gameView.hideMenu();
+    }
+
+    const handleCellClick = (index) => {
+        const playerNum = playerOneTurn ? 1 : 2;
+        gameBoard.fillCell(index, playerNum);
+    }
+    
+    // let playerOneTurn = true;
+    // while (true) {
+    //     const activePlayer = playerOneTurn ? playerOne : playerTwo;
+    //     let cellIndex = prompt(`${activePlayer.name}, enter a cell (0-8):`);
+    //     gameBoard.fillCell(cellIndex, activePlayer.getNumber());
+    //     gameBoard.printBoard();
+    //     const winner = gameBoard.checkWin();
+    //     if (winner === 0) {
+    //         console.log("Tie!");
+    //         break;
+    //     } else if (winner > 0) {
+    //         console.log(`${activePlayer.name} wins!`);
+    //         break;
+    //     }
+    //     playerOneTurn = !playerOneTurn;
+    // }
+    return {
+        handleStart,
+        handleCellClick
+    }
+})();
