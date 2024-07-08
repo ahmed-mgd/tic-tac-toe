@@ -1,4 +1,4 @@
-# tic-tac-toe
+# Tic-Tac-Toe
 
 Plain Javascript implementation of the game "Tic Tac Toe".
 
