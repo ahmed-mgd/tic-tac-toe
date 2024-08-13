@@ -2,6 +2,8 @@
 
 Plain Javascript implementation of the game "Tic Tac Toe".
 
+Live Demo: https://ahmed-mgd.github.io/tic-tac-toe/
+
 ![screenshot](sc.png)
 
 ## Topics 
